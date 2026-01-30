@@ -112,13 +112,14 @@ export default function AdminProducts() {
   };
 
   const handleUpdateDollar = async () => {
-    if (!newDollar || parseFloat(newDollar) <= 0) {
-      setMessage({ type: 'error', text: 'Введите корректный курс доллара' });
+    const rate = parseFloat(newDollar);
+    if (!newDollar || isNaN(rate) || rate <= 0) {
+      setMessage({ type: 'error', text: 'Введите корректный курс доллара (положительное число)' });
       return;
     }
 
     try {
-      await api.post('/excel/dollar-rate', { dollar: parseFloat(newDollar) });
+      await api.post('/excel/dollar-rate', { dollar: rate });
       setMessage({ type: 'success', text: 'Курс доллара успешно обновлен!' });
       setNewDollar('');
       loadProducts();

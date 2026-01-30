@@ -169,7 +169,15 @@ export class ExcelService {
       throw new Error('Worksheet not found');
     }
 
-    let imported = 0;
+    const productsToSave: Array<{
+      section: string;
+      name: string;
+      retailPrice: number;
+      dealerPrice: number;
+      dollar: number;
+      availability: string;
+      description: string;
+    }> = [];
 
     worksheet.eachRow((row, rowNumber) => {
       // Skip header row if exists
@@ -183,7 +191,7 @@ export class ExcelService {
       const description = row.getCell(6).value?.toString() || '';
 
       if (name) {
-        this.productsRepository.save({
+        productsToSave.push({
           section,
           name,
           retailPrice,
@@ -192,11 +200,15 @@ export class ExcelService {
           availability,
           description,
         });
-        imported++;
       }
     });
 
-    return { imported };
+    // Save all products with proper async handling
+    if (productsToSave.length > 0) {
+      await this.productsRepository.save(productsToSave);
+    }
+
+    return { imported: productsToSave.length };
   }
 
   async updateDollarRate(newRate: number): Promise<{ updated: number }> {

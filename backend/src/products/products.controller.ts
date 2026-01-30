@@ -70,14 +70,14 @@ export class ProductsController {
     return { message: 'Product deleted successfully' };
   }
 
-  @Get('category/:categoryId')
+  @Get('by-category/:categoryId')
   @ApiOperation({ summary: 'Get products by category' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   async findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.productsService.findByCategory(categoryId);
   }
 
-  @Get('section/:section')
+  @Get('by-section/:section')
   @ApiOperation({ summary: 'Get products by section' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   async findBySection(@Param('section') section: string) {
