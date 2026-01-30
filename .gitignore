@@ -1,13 +1,50 @@
+# Dependencies
 /node_modules
+/vendor
+
+# Laravel
 /public/hot
 /public/storage
 /storage/*.key
-/vendor
+.phpunit.result.cache
+
+# Environment files
 .env
 .env.backup
-.phpunit.result.cache
+.env.local
+.env.*.local
+
+# Build outputs
+/dist
+/build
+
+# Next.js
+frontend/.next
+frontend/out
+frontend/node_modules
+
+# NestJS
+backend/dist
+backend/node_modules
+
+# Docker
 docker-compose.override.yml
+
+# Local configs
 Homestead.json
 Homestead.yaml
+
+# Logs
 npm-debug.log
 yarn-error.log
+*.log
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
