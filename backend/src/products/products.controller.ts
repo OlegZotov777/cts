@@ -19,6 +19,13 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  @Get('sections')
+  @ApiOperation({ summary: 'Get all product sections' })
+  @ApiResponse({ status: 200, description: 'Sections retrieved successfully' })
+  async getSections() {
+    return this.productsService.getAllSections();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
   @ApiResponse({ status: 200, description: 'Product retrieved successfully' })
@@ -68,5 +75,12 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   async findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.productsService.findByCategory(categoryId);
+  }
+
+  @Get('section/:section')
+  @ApiOperation({ summary: 'Get products by section' })
+  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
+  async findBySection(@Param('section') section: string) {
+    return this.productsService.findBySection(section);
   }
 }

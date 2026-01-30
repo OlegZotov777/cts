@@ -11,6 +11,11 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({ description: 'Product section' })
+  @IsOptional()
+  @IsString()
+  section?: string;
+
   @ApiProperty({ description: 'Retail price' })
   @IsNumber()
   @IsPositive()
@@ -47,6 +52,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({ description: 'Product section' })
+  @IsOptional()
+  @IsString()
+  section?: string;
 
   @ApiPropertyOptional({ description: 'Retail price' })
   @IsOptional()
@@ -86,6 +96,11 @@ export class ProductQueryDto {
   @IsOptional()
   @IsNumber()
   categoryId?: number;
+
+  @ApiPropertyOptional({ description: 'Section filter' })
+  @IsOptional()
+  @IsString()
+  section?: string;
 
   @ApiPropertyOptional({ description: 'Page number', default: 1 })
   @IsOptional()

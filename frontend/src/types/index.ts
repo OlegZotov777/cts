@@ -2,8 +2,10 @@ export interface Product {
   id: number;
   name: string;
   description: string | null;
+  section: string | null;
   retailPrice: number;
   dealerPrice: number;
+  dollar: number;
   availability: string;
   imageUrl: string | null;
   categoryId: number | null;
@@ -71,4 +73,5 @@ export interface AuthResponse {
 export interface ProductsResponse {
   products: Product[];
   total: number;
+  currentDollar: number;
 }

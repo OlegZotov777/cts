@@ -11,27 +11,28 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
   ) {}
 
-  async findAll(query: ProductQueryDto): Promise<{ products: Product[]; total: number }> {
-    const { search, categoryId, page = 1, limit = 20 } = query;
+  async findAll(query: ProductQueryDto): Promise<{ products: Product[]; total: number; currentDollar: number }> {
+    const { search, categoryId, section, page = 1, limit = 20 } = query;
     
-    const where: FindOptionsWhere<Product> = {};
-    
-    if (categoryId) {
-      where.categoryId = categoryId;
-    }
-
     let queryBuilder = this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category');
 
     if (search) {
-      queryBuilder = queryBuilder.where(
-        '(LOWER(product.name) LIKE :search OR LOWER(product.description) LIKE :search)',
-        { search: `%${search.toLowerCase()}%` }
-      );
+      const keywords = search.split(' ').filter(Boolean);
+      for (const word of keywords) {
+        queryBuilder = queryBuilder.andWhere(
+          '(LOWER(product.name) LIKE :word OR LOWER(product.description) LIKE :word)',
+          { word: `%${word.toLowerCase()}%` }
+        );
+      }
     }
 
     if (categoryId) {
       queryBuilder = queryBuilder.andWhere('product.categoryId = :categoryId', { categoryId });
+    }
+
+    if (section) {
+      queryBuilder = queryBuilder.andWhere('product.section = :section', { section });
     }
 
     const [products, total] = await queryBuilder
@@ -39,7 +40,11 @@ export class ProductsService {
       .take(limit)
       .getManyAndCount();
 
-    return { products, total };
+    // Get current dollar rate
+    const firstProduct = await this.productsRepository.findOne({ where: {} });
+    const currentDollar = firstProduct?.dollar || 1.0;
+
+    return { products, total, currentDollar };
   }
 
   async findOne(id: number): Promise<Product> {
@@ -74,5 +79,21 @@ export class ProductsService {
       where: { categoryId },
       relations: ['category'],
     });
+  }
+
+  async findBySection(section: string): Promise<Product[]> {
+    return this.productsRepository.find({
+      where: { section },
+    });
+  }
+
+  async getAllSections(): Promise<string[]> {
+    const products = await this.productsRepository
+      .createQueryBuilder('product')
+      .select('DISTINCT product.section', 'section')
+      .where('product.section IS NOT NULL')
+      .getRawMany();
+    
+    return products.map(p => p.section).filter(Boolean);
   }
 }

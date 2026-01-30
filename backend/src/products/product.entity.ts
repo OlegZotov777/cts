@@ -12,11 +12,17 @@ export class Product {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column({ nullable: true })
+  section: string;
+
+  @Column('decimal', { precision: 10, scale: 2, name: 'retail_price' })
   retailPrice: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, name: 'dealer_price' })
   dealerPrice: number;
+
+  @Column('decimal', { precision: 10, scale: 4, default: 1.0 })
+  dollar: number;
 
   @Column({ default: 'В наличии' })
   availability: string;
