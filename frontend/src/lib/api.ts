@@ -22,17 +22,27 @@ class ApiClient {
     return headers;
   }
 
+  private async handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch {
+        // If response body is not JSON, use the default message
+      }
+      throw new Error(errorMessage);
+    }
+    return response.json();
+  }
+
   async get<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
+    return this.handleResponse<T>(response);
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
@@ -42,12 +52,7 @@ class ApiClient {
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
+    return this.handleResponse<T>(response);
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
@@ -57,11 +62,7 @@ class ApiClient {
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
+    return this.handleResponse<T>(response);
   }
 
   async delete<T>(endpoint: string): Promise<T> {
@@ -70,11 +71,7 @@ class ApiClient {
       headers: this.getHeaders(),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
+    return this.handleResponse<T>(response);
   }
 }
 

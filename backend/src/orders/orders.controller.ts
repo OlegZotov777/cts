@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
@@ -38,7 +38,7 @@ export class OrdersController {
     const order = await this.ordersService.findOne(id);
     // Only allow users to view their own orders unless admin
     if (req.user.role !== UserRole.ADMIN && order.userId !== req.user.id) {
-      throw new Error('You can only view your own orders');
+      throw new ForbiddenException('You can only view your own orders');
     }
     return order;
   }

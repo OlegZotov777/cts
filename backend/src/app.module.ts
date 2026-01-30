@@ -25,7 +25,8 @@ import { AuthModule } from './auth/auth.module';
         password: configService.get('DB_PASSWORD', 'postgres'),
         database: configService.get('DB_DATABASE', 'shop'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') !== 'production',
+        // Only enable synchronize in development via explicit config, never automatically
+        synchronize: configService.get('DB_SYNCHRONIZE', 'false') === 'true',
       }),
     }),
     ProductsModule,

@@ -19,12 +19,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
+  // Only access localStorage after component mounts (client-side only)
   useEffect(() => {
+    setIsMounted(true);
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        // Invalid JSON in localStorage, clear it
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
     }
     setIsLoading(false);
   }, []);
@@ -52,8 +61,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isDealer = user?.role === 'dealer' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
 
+  // Prevent hydration mismatch by not rendering user-dependent content until mounted
+  const contextValue = {
+    user: isMounted ? user : null,
+    isLoading: isMounted ? isLoading : true,
+    login,
+    register,
+    logout,
+    isDealer: isMounted ? isDealer : false,
+    isAdmin: isMounted ? isAdmin : false,
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, isDealer, isAdmin }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
